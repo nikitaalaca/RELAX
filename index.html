@@ -186,7 +186,7 @@
             mainGain: null,
             subNodes: [],
             isPlaying: false,
-            currentVolume: 0.05,
+            currentVolume: 0.03,
 
             init() {
                 if (!this.ctx) {
@@ -639,7 +639,7 @@
                 streamMusicRef.current = new Audio(session.url);
                 streamMusicRef.current.loop = true;
                 streamMusicRef.current.crossOrigin = "anonymous";
-                streamMusicRef.current.volume = 0.04; 
+                streamMusicRef.current.volume = 0.03; 
 
                 if (AudioEngine.ctx) {
                     try {
@@ -703,7 +703,7 @@
                                 speechDurationCounterRef.current += 1;
 
                                 // Умное прерывание: если гид говорит дольше 15 секунд — даем отдохнуть
-                                if (speechDurationCounterRef.current >= 15) {
+                                if (speechDurationCounterRef.current >= 25) {
                                     if (voiceAudioRef.current) voiceAudioRef.current.pause();
                                     isVoicePlayingRef.current = false;
                                     speechDurationCounterRef.current = 0;
