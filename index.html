@@ -126,9 +126,14 @@
         .eq-bar { animation: eqBar 1.2s ease-in-out infinite; transform-origin: bottom; }
         .eq-fast { animation-duration: 0.6s; }
         .eq-slow { animation-duration: 1.8s; }
+        
+        /* Исправление для безопасного скролла на iOS */
+        .safe-bottom {
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
     </style>
 </head>
-<body>
+<body class="safe-bottom">
 
     <div id="root"></div>
 
@@ -139,9 +144,9 @@
     </div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+        const { useState, useEffect, useRef, useCallback } = React;
 
-        // Список из 4 новых универсальных файлов озвучки
+        // Список из 4 новых универсальных файлов озвучки (замените на реальные пути)
         const VOICE_FILES = [
             "audio/voice_1.mp3",
             "audio/voice_2.mp3",
@@ -181,6 +186,7 @@
             { id: "quick", title: "Быстрое расслабление", bg: "bg-[#E0F2FE]", iconColor: "text-[#06B6D4]", symbol: "⏳" }
         ];
 
+        // ---------- Audio Engine (синтез фоновых звуков) ----------
         const AudioEngine = {
             ctx: null,
             mainGain: null,
@@ -374,6 +380,8 @@
             }
         };
 
+        // ---------- Компоненты ----------
+
         function DynamicTicker() {
             const [currentIndex, setCurrentIndex] = useState(0);
             useEffect(() => {
@@ -399,11 +407,11 @@
             const [userStreak, setUserStreak] = useState(4);
             const [userTotalMinutes, setUserTotalMinutes] = useState(75);
 
-            const handleQuickStart = () => {
+            const handleQuickStart = useCallback(() => {
                 const available = selectedCategoryFilter ? ALL_SESSIONS.filter(s => s.category === selectedCategoryFilter) : ALL_SESSIONS;
                 const randomTrack = available[Math.floor(Math.random() * available.length)];
                 setActivePlayerSession(randomTrack);
-            };
+            }, [selectedCategoryFilter]);
 
             return (
                 <div className="min-h-screen pb-36 pt-4 px-4 max-w-xl mx-auto relative flex flex-col justify-between">
@@ -462,8 +470,9 @@
             const displayedSessions = activeCategory ? ALL_SESSIONS.filter(s => s.category === activeCategory) : ALL_SESSIONS;
             const trackSectionRef = useRef(null);
 
-            const handleDirectionClick = (dir) => {
+            const handleDirectionClick = useCallback((dir) => {
                 if (dir.isSpecial) {
+                    setActiveCategory(null); // сброс фильтра при переходе к дыханию
                     setTab('breathwork');
                 } else {
                     const nextCategory = activeCategory === dir.title ? null : dir.title;
@@ -472,7 +481,7 @@
                         setTimeout(() => { trackSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 120);
                     }
                 }
-            };
+            }, [activeCategory, setActiveCategory, setTab]);
 
             return (
                 <div className="space-y-8 text-center">
@@ -568,6 +577,13 @@
             const [timer, setTimer] = useState(4);
             const [active, setActive] = useState(false);
 
+            // Очистка звука при уходе с вкладки
+            useEffect(() => {
+                return () => {
+                    AudioEngine.stop();
+                };
+            }, []);
+
             useEffect(() => {
                 let interval = null;
                 if (active) {
@@ -580,12 +596,26 @@
                             return t - 1;
                         });
                     }, 1000);
-                } else { clearInterval(interval); }
+                } else { 
+                    clearInterval(interval); 
+                }
                 return () => clearInterval(interval);
             }, [active]);
 
+            const togglePractice = useCallback(() => {
+                setActive(prev => {
+                    const next = !prev;
+                    if (next) {
+                        AudioEngine.playAmbient('oriental', 'Дыхательные практики');
+                    } else {
+                        AudioEngine.stop();
+                    }
+                    return next;
+                });
+            }, []);
+
             return (
-                <div className="max-w-md mx-auto text-center space-y-6 pt-4 animate-fade-in">
+                <div className="max-w-md mx-auto text-center space-y-6 pt-4 page-transition">
                     <h2 className="text-xl font-black text-zinc-900">Антистресс-дыхание</h2>
                     <div className="liquid-glass bg-white rounded-[40px] aspect-square max-w-[240px] mx-auto flex flex-col justify-center items-center relative shadow-sm">
                         {active && (
@@ -597,7 +627,7 @@
                         <h3 className="text-base font-bold z-10 text-zinc-800">{active ? phase : 'Квадрат баланса'}</h3>
                         <div className="text-4xl font-light mt-2 z-10 tabular-nums">{timer}с</div>
                     </div>
-                    <button onClick={() => { setActive(!active); if(!active) AudioEngine.playAmbient('oriental', 'Дыхательные практики'); else AudioEngine.stop(); }} className="w-full max-w-[180px] py-3.5 bg-zinc-950 text-white rounded-full font-bold shadow-md apple-spring text-xs uppercase tracking-wider">
+                    <button onClick={togglePractice} className="w-full max-w-[180px] py-3.5 bg-zinc-950 text-white rounded-full font-bold shadow-md apple-spring text-xs uppercase tracking-wider">
                         {active ? 'Остановить' : 'Начать практику'}
                     </button>
                 </div>
@@ -614,33 +644,41 @@
             const streamMusicRef = useRef(null);
             
             const currentVoiceIdxRef = useRef(0);
-            const voiceCooldownRef = useRef(5); // Первая фраза зазвучит через 5 секунд после входа
+            const voiceCooldownRef = useRef(5); 
             const isVoicePlayingRef = useRef(false);
-            const speechDurationCounterRef = useRef(0); // Счетчик длительности текущей фразы
+            const speechDurationCounterRef = useRef(0);
+            const completedRef = useRef(false); // флаг предотвращения двойного завершения
 
             const totalSeconds = session.duration * 60;
             const elapsedSeconds = totalSeconds - secondsRemaining;
 
+            // Инициализация аудио-элементов
             useEffect(() => {
                 AudioEngine.init();
 
+                // Голосовой гид
                 voiceAudioRef.current = new Audio();
                 voiceAudioRef.current.crossOrigin = "anonymous";
                 voiceAudioRef.current.volume = 0.50; 
 
-                // Если запись закончилась сама раньше лимита в 15 секунд
                 const handleVoiceEnded = () => {
                     isVoicePlayingRef.current = false;
                     speechDurationCounterRef.current = 0;
-                    voiceCooldownRef.current = 60; // Уходим на 1 минуту в глубокую паузу
+                    voiceCooldownRef.current = 60;
                 };
                 voiceAudioRef.current.addEventListener('ended', handleVoiceEnded);
 
+                // Потоковое радио
                 streamMusicRef.current = new Audio(session.url);
                 streamMusicRef.current.loop = true;
                 streamMusicRef.current.crossOrigin = "anonymous";
-                streamMusicRef.current.volume = 0.04; 
+                streamMusicRef.current.volume = 0.04;
+                streamMusicRef.current.onerror = (e) => {
+                    console.warn("Радио-поток недоступен, используем только синтезированный звук.");
+                    // Не прерываем работу, синтез продолжается
+                };
 
+                // Подключение к AudioContext для возможности маршрутизации (опционально)
                 if (AudioEngine.ctx) {
                     try {
                         const voiceSource = AudioEngine.ctx.createMediaElementSource(voiceAudioRef.current);
@@ -649,12 +687,13 @@
                         const musicSource = AudioEngine.ctx.createMediaElementSource(streamMusicRef.current);
                         musicSource.connect(AudioEngine.ctx.destination);
                     } catch (e) {
-                        console.log("Audio bypass log: active");
+                        // Уже подключено или не поддерживается – игнорируем
                     }
                 }
 
+                // Старт воспроизведения
                 if (isPlaying) {
-                    streamMusicRef.current.play().catch(()=>{});
+                    streamMusicRef.current.play().catch(() => {});
                     AudioEngine.playAmbient(soundType, session.category);
                 }
 
@@ -663,62 +702,69 @@
                         voiceAudioRef.current.pause();
                         voiceAudioRef.current.removeEventListener('ended', handleVoiceEnded);
                     }
-                    if (streamMusicRef.current) streamMusicRef.current.pause();
+                    if (streamMusicRef.current) {
+                        streamMusicRef.current.pause();
+                        streamMusicRef.current.src = ''; // предотвращаем утечку
+                    }
                     AudioEngine.stop();
                 };
-            }, []);
+            }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+            // Управление play/pause и типом звука
             useEffect(() => {
                 if (isPlaying) {
                     AudioEngine.playAmbient(soundType, session.category);
                     if (streamMusicRef.current) {
-                        streamMusicRef.current.play().catch(()=>{});
+                        streamMusicRef.current.play().catch(() => {});
                     }
                     if (isVoiceEnabled && isVoicePlayingRef.current && voiceAudioRef.current) {
-                        voiceAudioRef.current.play().catch(()=>{});
+                        voiceAudioRef.current.play().catch(() => {});
                     }
                 } else {
                     AudioEngine.stop();
                     if (voiceAudioRef.current) voiceAudioRef.current.pause();
                     if (streamMusicRef.current) streamMusicRef.current.pause();
                 }
-            }, [isPlaying, soundType]);
+            }, [isPlaying, soundType, session.category, isVoiceEnabled]);
 
-            // Основной посекундный игровой цикл
+            // Мгновенная реакция на отключение голоса
+            useEffect(() => {
+                if (!isVoiceEnabled && voiceAudioRef.current) {
+                    voiceAudioRef.current.pause();
+                    isVoicePlayingRef.current = false;
+                    speechDurationCounterRef.current = 0;
+                    voiceCooldownRef.current = 5;
+                }
+            }, [isVoiceEnabled]);
+
+            // Основной таймер сессии + логика голосового сопровождения
             useEffect(() => {
                 let sessionTimer = null;
                 
                 if (isPlaying && secondsRemaining > 0) {
                     sessionTimer = setInterval(() => {
-                        
-                        if (!isVoiceEnabled) {
-                            if (voiceAudioRef.current && !voiceAudioRef.current.paused) {
-                                voiceAudioRef.current.pause();
-                            }
-                            isVoicePlayingRef.current = false;
-                            speechDurationCounterRef.current = 0;
-                            voiceCooldownRef.current = 5; 
-                        } else {
+                        // Логика голосового гида (только если включен и не на паузе голос)
+                        if (isVoiceEnabled) {
                             if (isVoicePlayingRef.current) {
                                 speechDurationCounterRef.current += 1;
-
-                                // Умное прерывание: если гид говорит дольше 15 секунд — даем отдохнуть
+                                // Если гид говорит слишком долго (>25 сек), принудительно останавливаем
                                 if (speechDurationCounterRef.current >= 25) {
                                     if (voiceAudioRef.current) voiceAudioRef.current.pause();
                                     isVoicePlayingRef.current = false;
                                     speechDurationCounterRef.current = 0;
-                                    voiceCooldownRef.current = 60; // Запуск минутной паузы
+                                    voiceCooldownRef.current = 60;
                                 } else {
+                                    // продолжаем играть, если вдруг встал на паузу
                                     if (voiceAudioRef.current && voiceAudioRef.current.paused) {
-                                        voiceAudioRef.current.play().catch(()=>{});
+                                        voiceAudioRef.current.play().catch(() => {});
                                     }
                                 }
                             } else {
-                                // Режим ожидания/тишины гида
+                                // Тишина гида, ждём кулдаун
                                 if (voiceCooldownRef.current > 0) {
                                     voiceCooldownRef.current -= 1;
                                 } else {
-                                    // Запускаем случайную или следующую запись из 4 универсальных вариантов
+                                    // Запускаем следующую случайную запись
                                     if (voiceAudioRef.current) {
                                         voiceAudioRef.current.src = VOICE_FILES[currentVoiceIdxRef.current];
                                         voiceAudioRef.current.load();
@@ -726,17 +772,23 @@
                                             isVoicePlayingRef.current = true;
                                             speechDurationCounterRef.current = 0;
                                             currentVoiceIdxRef.current = (currentVoiceIdxRef.current + 1) % VOICE_FILES.length;
-                                        }).catch(e => console.log("Voice system play hold", e));
+                                        }).catch(e => console.log("Voice play prevented", e));
                                     }
                                 }
                             }
+                        } else {
+                            // Голос выключен, ничего не делаем
                         }
 
+                        // Обратный отсчёт
                         if (secondsRemaining <= 1) {
-                            AudioEngine.stop();
-                            if (voiceAudioRef.current) voiceAudioRef.current.pause();
-                            if (streamMusicRef.current) streamMusicRef.current.pause();
-                            onComplete(session.duration);
+                            if (!completedRef.current) {
+                                completedRef.current = true;
+                                AudioEngine.stop();
+                                if (voiceAudioRef.current) voiceAudioRef.current.pause();
+                                if (streamMusicRef.current) streamMusicRef.current.pause();
+                                onComplete(session.duration);
+                            }
                         } else {
                             setSecondsRemaining(prev => prev - 1);
                         }
@@ -744,14 +796,11 @@
                 }
                 
                 return () => clearInterval(sessionTimer);
-            }, [isPlaying, isVoiceEnabled, secondsRemaining]);
+            }, [isPlaying, isVoiceEnabled, secondsRemaining, session.duration, onComplete]);
 
-            const changeNoiseDirectly = (type) => {
+            const changeNoiseDirectly = useCallback((type) => {
                 setSoundType(type);
-                if (isPlaying) {
-                    AudioEngine.playAmbient(type, session.category);
-                }
-            };
+            }, []);
 
             const progressPercentage = (elapsedSeconds / totalSeconds) * 100;
 
@@ -776,7 +825,7 @@
                             <h2 className="font-extrabold text-zinc-900 text-xs truncate">{session.title}</h2>
                             <span className="text-[9px] font-bold text-cyan-600 block mt-0.5">Режим: {session.category}</span>
                         </div>
-                        <button onClick={() => { AudioEngine.stop(); if (voiceAudioRef.current) voiceAudioRef.current.pause(); if(streamMusicRef.current) streamMusicRef.current.pause(); onComplete(session.duration); }} className="bg-zinc-900 text-white px-5 py-2.5 rounded-full text-xs font-bold apple-spring">Готово</button>
+                        <button onClick={() => { if (!completedRef.current) { completedRef.current = true; AudioEngine.stop(); if (voiceAudioRef.current) voiceAudioRef.current.pause(); if(streamMusicRef.current) streamMusicRef.current.pause(); onComplete(session.duration); } }} className="bg-zinc-900 text-white px-5 py-2.5 rounded-full text-xs font-bold apple-spring">Готово</button>
                     </div>
 
                     <div className="flex-1 flex flex-col items-center justify-center relative my-4 min-h-[180px] z-10">
