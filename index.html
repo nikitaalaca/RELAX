@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>QSTORE ZEN</title>
+    <title>QSTORE ZEN — Медитация & Релакс</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -13,127 +15,127 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
+        :root {
+            --bg-main: #F4F5F9;
+            --bg-card: rgba(255, 255, 255, 0.7);
+            --text-primary: #1D1D1F;
+            --text-secondary: #71717A;
+            --border-card: rgba(255, 255, 255, 0.9);
+            --shadow-card: 0 4px 20px rgba(0,0,0,0.03);
+            --glass-nav-bg: rgba(24, 24, 27, 0.85);
+            --glass-nav-border: rgba(255,255,255,0.08);
+            --accent: #06B6D4;
+            --accent-light: #E0F2FE;
+            --gradient-primary: linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-main: #0F0F11;
+                --bg-card: rgba(30, 30, 35, 0.75);
+                --text-primary: #F4F4F5;
+                --text-secondary: #A1A1AA;
+                --border-card: rgba(255,255,255,0.05);
+                --shadow-card: 0 4px 20px rgba(0,0,0,0.2);
+                --glass-nav-bg: rgba(30, 30, 35, 0.9);
+                --glass-nav-border: rgba(255,255,255,0.05);
+                --accent: #22D3EE;
+                --accent-light: #083344;
+            }
+        }
+
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #F4F5F9;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
-            color: #1D1D1F;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
         }
+
         .liquid-glass {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02), inset 0 1px 2px rgba(255, 255, 255, 0.9);
-            transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-card);
+            box-shadow: var(--shadow-card);
+            transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
         }
+
         .liquid-glass-dark {
-            background: rgba(24, 24, 27, 0.9);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            background: var(--glass-nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-nav-border);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
-        
+
         .mesh-background {
             position: fixed;
             inset: 0;
             z-index: -1;
-            background: #F2F4F8;
+            background: var(--bg-main);
             overflow: hidden;
         }
+
         .liquid-orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(130px);
-            mix-blend-mode: multiply;
-            opacity: 0.14;
-            animation: floatingMesh 18s infinite alternate ease-in-out;
+            filter: blur(120px);
+            opacity: 0.08;
+            animation: floatingMesh 20s infinite alternate ease-in-out;
+            mix-blend-mode: normal;
         }
-        .orb-1 { width: 700px; height: 700px; top: -100px; left: -100px; background: radial-gradient(circle, #06b6d4 0%, rgba(255,255,255,0) 70%); }
-        .orb-2 { width: 800px; height: 800px; bottom: -150px; right: -100px; background: radial-gradient(circle, #9333ea 0%, rgba(255,255,255,0) 70%); animation-delay: -5s; }
-        .orb-3 { width: 600px; height: 600px; top: 35%; left: 25%; background: radial-gradient(circle, #ec4899 0%, rgba(255,255,255,0) 70%); animation-delay: -10s; }
-        
+
+        .orb-1 { width: 600px; height: 600px; top: -80px; left: -80px; background: radial-gradient(circle, #06b6d4, transparent 70%); }
+        .orb-2 { width: 700px; height: 700px; bottom: -120px; right: -100px; background: radial-gradient(circle, #9333ea, transparent 70%); animation-delay: -7s; }
+        .orb-3 { width: 500px; height: 500px; top: 40%; left: 30%; background: radial-gradient(circle, #ec4899, transparent 70%); animation-delay: -14s; }
+
         @keyframes floatingMesh {
-            0% { transform: translate(0, 0) scale(1); filter: blur(130px); opacity: 0.12; }
-            50% { transform: translate(60px, -50px) scale(1.1); filter: blur(150px); opacity: 0.18; }
-            100% { transform: translate(-30px, 30px) scale(0.95); filter: blur(130px); opacity: 0.12; }
+            0% { transform: translate(0, 0) scale(1); opacity: 0.06; }
+            50% { transform: translate(40px, -30px) scale(1.1); opacity: 0.1; }
+            100% { transform: translate(-20px, 20px) scale(0.95); opacity: 0.06; }
         }
 
         @keyframes pageEnter {
-            0% { opacity: 0; transform: scale(0.99) translateY(12px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
+            0% { opacity: 0; transform: translateY(8px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
         .page-transition {
-            animation: pageEnter 550ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        @keyframes neonMoving1 {
-            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-            50% { transform: translate(45px, 35px) scale(1.15) rotate(90deg); }
-            100% { transform: translate(-25px, -15px) scale(0.95) rotate(180deg); }
-        }
-        @keyframes neonMoving2 {
-            0% { transform: translate(0, 0) scale(1.1) rotate(0deg); }
-            50% { transform: translate(-40px, -45px) scale(0.9) rotate(-120deg); }
-            100% { transform: translate(25px, 25px) scale(1.05) rotate(360deg); }
-        }
-        .player-neon-container {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-            z-index: 0;
-            pointer-events: none;
-        }
-        .player-neon-orb-1 {
-            position: absolute; width: 450px; height: 450px; top: -80px; left: -100px;
-            background: radial-gradient(circle, rgba(6, 182, 212, 0.28) 0%, rgba(255, 255, 255, 0) 70%);
-            filter: blur(90px); animation: neonMoving1 15s infinite alternate ease-in-out;
-        }
-        .player-neon-orb-2 {
-            position: absolute; width: 500px; height: 500px; bottom: -100px; right: -100px;
-            background: radial-gradient(circle, rgba(147, 51, 234, 0.22) 0%, rgba(255, 255, 255, 0) 70%);
-            filter: blur(100px); animation: neonMoving2 19s infinite alternate ease-in-out;
-        }
-        .player-neon-orb-3 {
-            position: absolute; width: 380px; height: 380px; top: 30%; left: 10%;
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, rgba(255, 255, 255, 0) 70%);
-            filter: blur(90px); animation: neonMoving1 22s infinite alternate-reverse ease-in-out;
+            animation: pageEnter 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         .apple-spring {
-            transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .apple-spring:hover { transform: translateY(-2px); }
-        .apple-spring:active { transform: scale(0.96); }
-        
-        @keyframes dynamicWave {
-            0% { transform: scale(0.9); opacity: 0.4; }
-            50% { transform: scale(1.3); opacity: 0.15; }
-            100% { transform: scale(1.6); opacity: 0; }
+        .apple-spring:active {
+            transform: scale(0.97);
         }
-        .visual-wave-1 { animation: dynamicWave 5s infinite cubic-bezier(0.25, 1, 0.5, 1); }
-        .visual-wave-2 { animation: dynamicWave 5s infinite cubic-bezier(0.25, 1, 0.5, 1); animation-delay: 2.5s; }
 
         .scrollbar-none::-webkit-scrollbar { display: none; }
         .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
 
         @keyframes eqBar {
-            0%, 100% { transform: scaleY(0.2); }
+            0%, 100% { transform: scaleY(0.3); }
             50% { transform: scaleY(1); }
         }
         .eq-bar { animation: eqBar 1.2s ease-in-out infinite; transform-origin: bottom; }
-        .eq-fast { animation-duration: 0.6s; }
-        .eq-slow { animation-duration: 1.8s; }
-        
-        /* Исправление для безопасного скролла на iOS */
-        .safe-bottom {
-            padding-bottom: env(safe-area-inset-bottom, 0px);
+
+        @keyframes dynamicWave {
+            0% { transform: scale(0.95); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.15; }
+            100% { transform: scale(1.4); opacity: 0; }
         }
+        .visual-wave-1 { animation: dynamicWave 6s infinite cubic-bezier(0.25, 1, 0.5, 1); }
+        .visual-wave-2 { animation: dynamicWave 6s infinite cubic-bezier(0.25, 1, 0.5, 1); animation-delay: 3s; }
+
+        .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .safe-top { padding-top: env(safe-area-inset-top, 0px); }
     </style>
 </head>
-<body class="safe-bottom">
+<body class="safe-bottom safe-top">
 
     <div id="root"></div>
 
@@ -146,53 +148,17 @@
     <script type="text/babel">
         const { useState, useEffect, useRef, useCallback } = React;
 
-        // Список из 4 новых универсальных файлов озвучки (замените на реальные пути)
-        const VOICE_FILES = [
-            "audio/voice_1.mp3",
-            "audio/voice_2.mp3",
-            "audio/voice_3.mp3",
-            "audio/voice_4.mp3"
-        ];
+        // Инициализация Telegram Mini App (необязательно, но добавим для будущих интеграций)
+        window.Telegram?.WebApp?.ready();
+        window.Telegram?.WebApp?.expand();
 
-        const SOUND_NAMES = { oriental: '🏮 Восток', bell: '🥣 Чаши', drone: '🪐 Космос', waves: '🌊 Океан', wind: '💨 Ветер' };
-        
-        const MOTIVATIONAL_MESSAGES = [
-            "Каждый проданный девайс делает мир вокруг технологичнее и чище!",
-            "Клиенты чувствуют твою уверенность. Выдохни, улыбнись и взорви эту смену!",
-            "Заряжай устройства на витрине и вовремя заряжай свой внутренний аккумулятор.",
-            "Премиальный сервис QSTORE начинается с твоего личного внутреннего спокойствия."
-        ];
-
-        const ALL_SESSIONS = [
-            { id: 1, title: "Восточное созерцание (Ситар и Флейта)", duration: 10, category: "Осознанность", sound: "oriental", url: "https://ice1.somafm.com/suburbsofgoa-128-mp3" },
-            { id: 2, title: "Тибетские чаши и покой ума", duration: 15, category: "Осознанность", sound: "bell", url: "https://ice1.somafm.com/dronezone-128-mp3" },
-            { id: 3, title: "Мягкий Азиатский Дзен-Эмбиент", duration: 12, category: "Осознанность", sound: "oriental", url: "https://ice1.somafm.com/suburbsofgoa-128-mp3" },
-            { id: 4, title: "Космический вечный штиль", duration: 30, category: "Сон", sound: "drone", url: "https://ice1.somafm.com/deepspaceone-128-mp3" },
-            { id: 5, title: "Колыбельная ночного ветра", duration: 25, category: "Сон", sound: "wind", url: "https://ice1.somafm.com/dronezone-128-mp3" },
-            { id: 6, title: "Разгрузка после сложных клиентов", duration: 15, category: "Снижение стресса", sound: "oriental", url: "https://ice1.somafm.com/suburbsofgoa-128-mp3" },
-            { id: 7, title: "Растворение тревоги в звуке", duration: 10, category: "Снижение стресса", sound: "bell", url: "https://ice1.somafm.com/dronezone-128-mp3" },
-            { id: 8, title: "Глубокий фокус без лишних мыслей", duration: 25, category: "Фокус и концентрация", sound: "drone", url: "https://ice1.somafm.com/deepspaceone-128-mp3" },
-            { id: 9, title: "Умиротворение и баланс QSTORE", duration: 15, category: "Благодарность", sound: "oriental", url: "https://ice1.somafm.com/suburbsofgoa-128-mp3" },
-            { id: 10, title: "Экспресс-релакс на перерыве", duration: 5, category: "Быстрое расслабление", sound: "oriental", url: "https://ice1.somafm.com/suburbsofgoa-128-mp3" }
-        ];
-
-        const DIRECTIONS = [
-            { id: "mind", title: "Осознанность", bg: "bg-[#E6F2FF]", iconColor: "text-[#3B82F6]", symbol: "✦" },
-            { id: "sleep", title: "Сон", bg: "bg-[#F3E8FF]", iconColor: "text-[#9333EA]", symbol: "☾" },
-            { id: "stress", title: "Снижение стресса", bg: "bg-[#E6FDF5]", iconColor: "text-[#10B981]", symbol: "❖" },
-            { id: "focus", title: "Фокус и концентрация", bg: "bg-[#FAE8FF]", iconColor: "text-[#D946EF]", symbol: "⬡" },
-            { id: "breath", title: "Дыхательные практики", bg: "bg-[#E0F2FE]", iconColor: "text-[#0284C7]", symbol: "💨", isSpecial: true },
-            { id: "gratitude", title: "Благодарность", bg: "bg-[#FCE7F3]", iconColor: "text-[#DB2777]", symbol: "♥" },
-            { id: "quick", title: "Быстрое расслабление", bg: "bg-[#E0F2FE]", iconColor: "text-[#06B6D4]", symbol: "⏳" }
-        ];
-
-        // ---------- Audio Engine (синтез фоновых звуков) ----------
+        // =================== АУДИО-ДВИЖОК (расширенный) ===================
         const AudioEngine = {
             ctx: null,
             mainGain: null,
             subNodes: [],
             isPlaying: false,
-            currentVolume: 0.03,
+            currentVolume: 0.04,
 
             init() {
                 if (!this.ctx) {
@@ -205,164 +171,187 @@
 
             playAmbient(type, category = "Осознанность") {
                 this.init();
-                this.stop(); 
+                this.stop();
                 this.isPlaying = true;
 
                 this.mainGain = this.ctx.createGain();
                 this.mainGain.gain.setValueAtTime(this.currentVolume, this.ctx.currentTime);
                 this.mainGain.connect(this.ctx.destination);
 
-                let isDeepRelax = (category === "Сон" || category === "Снижение стресса");
+                const isDeepRelax = (category === "Сон" || category === "Снижение стресса");
 
                 if (type === 'oriental') {
-                    const orientalScale = [164.81, 220.00, 246.94, 329.63, 440.00]; 
-                    orientalScale.forEach((freq, idx) => {
+                    const scale = [130.81, 164.81, 196.00, 246.94, 329.63];
+                    scale.forEach((freq, idx) => {
                         const osc = this.ctx.createOscillator();
-                        osc.type = 'triangle'; 
+                        osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
                         osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-
                         const filter = this.ctx.createBiquadFilter();
                         filter.type = 'lowpass';
-                        filter.frequency.setValueAtTime(300, this.ctx.currentTime); 
-
+                        filter.frequency.setValueAtTime(200 + idx * 50, this.ctx.currentTime);
                         const lfo = this.ctx.createOscillator();
                         lfo.type = 'sine';
-                        lfo.frequency.setValueAtTime(0.03 + idx * 0.01, this.ctx.currentTime);
-
+                        lfo.frequency.setValueAtTime(0.02 + idx * 0.01, this.ctx.currentTime);
                         const lfoGain = this.ctx.createGain();
-                        lfoGain.gain.setValueAtTime(0.08, this.ctx.currentTime);
-
-                        const volumeNode = this.ctx.createGain();
-                        volumeNode.gain.setValueAtTime(0.10, this.ctx.currentTime);
-
+                        lfoGain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                        const gainNode = this.ctx.createGain();
+                        gainNode.gain.setValueAtTime(0.08, this.ctx.currentTime);
                         lfo.connect(lfoGain);
-                        lfoGain.connect(volumeNode.gain);
+                        lfoGain.connect(gainNode.gain);
                         osc.connect(filter);
-                        filter.connect(volumeNode);
-                        volumeNode.connect(this.mainGain);
-                        
+                        filter.connect(gainNode);
+                        gainNode.connect(this.mainGain);
                         osc.start();
                         lfo.start();
-                        this.subNodes.push(osc, filter, lfo, lfoGain, volumeNode);
+                        this.subNodes.push(osc, filter, lfo, lfoGain, gainNode);
                     });
                 }
-                else if (type === 'drone') {
-                    const baseFreqs = isDeepRelax ? [55, 110, 165] : [73, 146, 219];
-                    baseFreqs.forEach((freq, i) => {
-                        const osc = this.ctx.createOscillator();
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-
-                        const filter = this.ctx.createBiquadFilter();
-                        filter.type = 'lowpass';
-                        filter.frequency.setValueAtTime(150, this.ctx.currentTime);
-
-                        const volumeNode = this.ctx.createGain();
-                        volumeNode.gain.setValueAtTime(0.15, this.ctx.currentTime);
-
-                        osc.connect(filter);
-                        filter.connect(volumeNode);
-                        volumeNode.connect(this.mainGain);
-                        
-                        osc.start();
-                        this.subNodes.push(osc, filter, volumeNode);
-                    });
-                } 
-                else if (type === 'waves') {
-                    const bufferSize = 3 * this.ctx.sampleRate;
-                    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-                    const data = buffer.getChannelData(0);
-                    for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
-
-                    const noiseSource = this.ctx.createBufferSource();
-                    noiseSource.buffer = buffer;
-                    noiseSource.loop = true;
-
-                    const filter = this.ctx.createBiquadFilter();
-                    filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(250, this.ctx.currentTime);
-
-                    const lfo = this.ctx.createOscillator();
-                    lfo.type = 'sine';
-                    lfo.frequency.setValueAtTime(0.08, this.ctx.currentTime);
-
-                    const lfoGain = this.ctx.createGain();
-                    lfoGain.gain.setValueAtTime(150, this.ctx.currentTime);
-
-                    const finalNoiseGain = this.ctx.createGain();
-                    finalNoiseGain.gain.setValueAtTime(0.8, this.ctx.currentTime); 
-
-                    lfo.connect(lfoGain);
-                    lfoGain.connect(filter.frequency);
-                    noiseSource.connect(filter);
-                    filter.connect(finalNoiseGain);
-                    finalNoiseGain.connect(this.mainGain);
-
-                    noiseSource.start();
-                    lfo.start();
-                    this.subNodes.push(noiseSource, lfo, filter, lfoGain, finalNoiseGain);
-                } 
-                else if (type === 'wind') {
-                    const bufferSize = 3 * this.ctx.sampleRate;
-                    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-                    const data = buffer.getChannelData(0);
-                    for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
-
-                    const noiseSource = this.ctx.createBufferSource();
-                    noiseSource.buffer = buffer;
-                    noiseSource.loop = true;
-
-                    const filter = this.ctx.createBiquadFilter();
-                    filter.type = 'bandpass';
-                    filter.Q.setValueAtTime(8.0, this.ctx.currentTime);
-                    filter.frequency.setValueAtTime(400, this.ctx.currentTime);
-
-                    const windLfo = this.ctx.createOscillator();
-                    windLfo.type = 'sine';
-                    windLfo.frequency.setValueAtTime(0.2, this.ctx.currentTime);
-
-                    const windLfoGain = this.ctx.createGain();
-                    windLfoGain.gain.setValueAtTime(100, this.ctx.currentTime);
-
-                    const windVolume = this.ctx.createGain();
-                    windVolume.gain.setValueAtTime(1.0, this.ctx.currentTime); 
-
-                    windLfo.connect(windLfoGain);
-                    windLfoGain.connect(filter.frequency);
-                    noiseSource.connect(filter);
-                    filter.connect(windVolume);
-                    windVolume.connect(this.mainGain);
-
-                    noiseSource.start();
-                    windLfo.start();
-                    this.subNodes.push(noiseSource, windLfo, filter, windLfoGain, windVolume);
-                } 
                 else if (type === 'bell') {
-                    const bellScale = [220.00, 277.18, 329.63, 440.00];
-                    bellScale.forEach((freq, idx) => {
+                    const frequencies = [174.61, 220.00, 261.63, 329.63, 392.00];
+                    frequencies.forEach((freq, idx) => {
                         const osc = this.ctx.createOscillator();
                         osc.type = 'sine';
                         osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-
                         const tremolo = this.ctx.createOscillator();
                         tremolo.type = 'sine';
-                        tremolo.frequency.setValueAtTime(0.15, this.ctx.currentTime);
-
+                        tremolo.frequency.setValueAtTime(0.12 + idx * 0.02, this.ctx.currentTime);
                         const tremoloGain = this.ctx.createGain();
-                        tremoloGain.gain.setValueAtTime(0.03, this.ctx.currentTime);
-
+                        tremoloGain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+                        const harmonic = this.ctx.createOscillator();
+                        harmonic.type = 'sine';
+                        harmonic.frequency.setValueAtTime(freq * 2, this.ctx.currentTime);
+                        const harmonicGain = this.ctx.createGain();
+                        harmonicGain.gain.setValueAtTime(0.02, this.ctx.currentTime);
                         const oscGain = this.ctx.createGain();
-                        oscGain.gain.setValueAtTime(0.10, this.ctx.currentTime);
-
+                        oscGain.gain.setValueAtTime(0.07, this.ctx.currentTime);
                         tremolo.connect(tremoloGain);
                         tremoloGain.connect(oscGain.gain);
                         osc.connect(oscGain);
+                        harmonic.connect(harmonicGain);
+                        harmonicGain.connect(this.mainGain);
                         oscGain.connect(this.mainGain);
-
                         osc.start();
                         tremolo.start();
-                        this.subNodes.push(osc, tremolo, tremoloGain, oscGain);
+                        harmonic.start();
+                        this.subNodes.push(osc, tremolo, harmonic, tremoloGain, harmonicGain, oscGain);
                     });
+                }
+                else if (type === 'drone') {
+                    const baseFreqs = isDeepRelax ? [55, 82.5, 110, 165] : [65.41, 98, 130.81, 196];
+                    baseFreqs.forEach((freq, i) => {
+                        const osc = this.ctx.createOscillator();
+                        osc.type = i === 0 ? 'sine' : 'triangle';
+                        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                        const filter = this.ctx.createBiquadFilter();
+                        filter.type = 'lowpass';
+                        filter.frequency.setValueAtTime(200 + i * 30, this.ctx.currentTime);
+                        const pan = this.ctx.createStereoPanner();
+                        pan.pan.setValueAtTime(i % 2 === 0 ? -0.3 : 0.3, this.ctx.currentTime);
+                        const gainNode = this.ctx.createGain();
+                        gainNode.gain.setValueAtTime(0.08, this.ctx.currentTime);
+                        osc.connect(filter);
+                        filter.connect(pan);
+                        pan.connect(gainNode);
+                        gainNode.connect(this.mainGain);
+                        osc.start();
+                        this.subNodes.push(osc, filter, pan, gainNode);
+                    });
+                }
+                else if (type === 'waves') {
+                    const bufferSize = 4 * this.ctx.sampleRate;
+                    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    let lastOut = 0;
+                    for (let i = 0; i < bufferSize; i++) {
+                        const white = Math.random() * 2 - 1;
+                        data[i] = (lastOut + (0.02 * white)) / 1.02;
+                        lastOut = data[i];
+                        data[i] *= 3.5;
+                    }
+                    const noiseSource = this.ctx.createBufferSource();
+                    noiseSource.buffer = buffer;
+                    noiseSource.loop = true;
+                    const filter = this.ctx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(400, this.ctx.currentTime);
+                    const lfo = this.ctx.createOscillator();
+                    lfo.type = 'sine';
+                    lfo.frequency.setValueAtTime(0.1, this.ctx.currentTime);
+                    const lfoGain = this.ctx.createGain();
+                    lfoGain.gain.setValueAtTime(200, this.ctx.currentTime);
+                    const noiseGain = this.ctx.createGain();
+                    noiseGain.gain.setValueAtTime(0.5, this.ctx.currentTime);
+                    lfo.connect(lfoGain);
+                    lfoGain.connect(filter.frequency);
+                    noiseSource.connect(filter);
+                    filter.connect(noiseGain);
+                    noiseGain.connect(this.mainGain);
+                    noiseSource.start();
+                    lfo.start();
+                    this.subNodes.push(noiseSource, lfo, filter, lfoGain, noiseGain);
+                }
+                else if (type === 'rain') {
+                    const bufferSize = 2 * this.ctx.sampleRate;
+                    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = Math.random() * 2 - 1;
+                    }
+                    const noiseSource = this.ctx.createBufferSource();
+                    noiseSource.buffer = buffer;
+                    noiseSource.loop = true;
+                    const filter = this.ctx.createBiquadFilter();
+                    filter.type = 'bandpass';
+                    filter.frequency.setValueAtTime(800, this.ctx.currentTime);
+                    filter.Q.setValueAtTime(0.5, this.ctx.currentTime);
+                    const gainNode = this.ctx.createGain();
+                    gainNode.gain.setValueAtTime(0.7, this.ctx.currentTime);
+                    noiseSource.connect(filter);
+                    filter.connect(gainNode);
+                    gainNode.connect(this.mainGain);
+                    noiseSource.start();
+                    this.subNodes.push(noiseSource, filter, gainNode);
+                }
+                else if (type === 'forest') {
+                    // Птицы + ветер (упрощённо)
+                    const osc = this.ctx.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+                    const lfo = this.ctx.createOscillator();
+                    lfo.type = 'sine';
+                    lfo.frequency.setValueAtTime(5, this.ctx.currentTime);
+                    const lfoGain = this.ctx.createGain();
+                    lfoGain.gain.setValueAtTime(200, this.ctx.currentTime);
+                    const gainNode = this.ctx.createGain();
+                    gainNode.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                    lfo.connect(lfoGain);
+                    lfoGain.connect(osc.frequency);
+                    osc.connect(gainNode);
+                    gainNode.connect(this.mainGain);
+                    osc.start();
+                    lfo.start();
+                    this.subNodes.push(osc, lfo, lfoGain, gainNode);
+                }
+                else if (type === 'fire') {
+                    const bufferSize = 2 * this.ctx.sampleRate;
+                    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = (Math.random() * 2 - 1) * 0.3;
+                    }
+                    const noiseSource = this.ctx.createBufferSource();
+                    noiseSource.buffer = buffer;
+                    noiseSource.loop = true;
+                    const filter = this.ctx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(300, this.ctx.currentTime);
+                    const gainNode = this.ctx.createGain();
+                    gainNode.gain.setValueAtTime(0.8, this.ctx.currentTime);
+                    noiseSource.connect(filter);
+                    filter.connect(gainNode);
+                    gainNode.connect(this.mainGain);
+                    noiseSource.start();
+                    this.subNodes.push(noiseSource, filter, gainNode);
                 }
             },
 
@@ -377,29 +366,124 @@
                 }
                 this.subNodes = [];
                 this.isPlaying = false;
+            },
+
+            setVolume(volume) {
+                this.currentVolume = volume;
+                if (this.mainGain) {
+                    this.mainGain.gain.setValueAtTime(volume, this.ctx.currentTime);
+                }
             }
         };
 
-        // ---------- Компоненты ----------
+        // =================== КОНСТАНТЫ И ДАННЫЕ ===================
+        const VOICE_FILES = [
+            "audio/voice_1.mp3",
+            "audio/voice_2.mp3",
+            "audio/voice_3.mp3",
+            "audio/voice_4.mp3"
+        ];
 
+        // Полный набор звуков
+        const SOUND_NAMES = {
+            oriental: '🏮 Восток',
+            bell: '🔔 Чаши',
+            drone: '🪐 Космос',
+            waves: '🌊 Океан',
+            rain: '🌧 Дождь',
+            forest: '🌲 Лес',
+            fire: '🔥 Костёр',
+            wind: '💨 Ветер'
+        };
+
+        // Мотивирующие сообщения
+        const MOTIVATIONAL_MESSAGES = [
+            "Каждый проданный девайс делает мир вокруг технологичнее и чище! ✨",
+            "Клиенты чувствуют твою уверенность. Выдохни, улыбнись и взорви эту смену! 💪",
+            "Заряжай устройства на витрине и вовремя заряжай свой внутренний аккумулятор. 🔋",
+            "Премиальный сервис QSTORE начинается с твоего личного внутреннего спокойствия. 🧘"
+        ];
+
+        // Все сессии с привязанным типом звука по умолчанию
+        const ALL_SESSIONS = [
+            { id: 1, title: "Восточное созерцание", duration: 10, category: "Осознанность", sound: "oriental", url: "https://ice1.somafm.com/suburbsofgoa-128-mp3" },
+            { id: 2, title: "Тибетские чаши и покой", duration: 15, category: "Осознанность", sound: "bell", url: "https://ice1.somafm.com/dronezone-128-mp3" },
+            { id: 3, title: "Мягкий Дзен-Эмбиент", duration: 12, category: "Осознанность", sound: "forest", url: "" },
+            { id: 4, title: "Космический штиль", duration: 30, category: "Сон", sound: "drone", url: "https://ice1.somafm.com/deepspaceone-128-mp3" },
+            { id: 5, title: "Колыбельная дождя", duration: 25, category: "Сон", sound: "rain", url: "" },
+            { id: 6, title: "Разгрузка после клиентов", duration: 15, category: "Снижение стресса", sound: "fire", url: "" },
+            { id: 7, title: "Растворение тревоги", duration: 10, category: "Снижение стресса", sound: "bell", url: "" },
+            { id: 8, title: "Глубокий фокус", duration: 25, category: "Фокус и концентрация", sound: "drone", url: "" },
+            { id: 9, title: "Баланс QSTORE", duration: 15, category: "Благодарность", sound: "oriental", url: "" },
+            { id: 10, title: "Экспресс-релакс", duration: 5, category: "Быстрое расслабление", sound: "waves", url: "" }
+        ];
+
+        const DIRECTIONS = [
+            { id: "mind", title: "Осознанность", icon: "✦", color: "text-blue-500", bg: "bg-blue-500/10" },
+            { id: "sleep", title: "Сон", icon: "☾", color: "text-purple-500", bg: "bg-purple-500/10" },
+            { id: "stress", title: "Антистресс", icon: "❖", color: "text-emerald-500", bg: "bg-emerald-500/10" },
+            { id: "focus", title: "Фокус", icon: "⬡", color: "text-pink-500", bg: "bg-pink-500/10" },
+            { id: "breath", title: "Дыхание", icon: "💨", color: "text-sky-500", bg: "bg-sky-500/10", isSpecial: true },
+            { id: "gratitude", title: "Благодарность", icon: "♥", color: "text-rose-500", bg: "bg-rose-500/10" },
+            { id: "quick", title: "Быстрый релакс", icon: "⏳", color: "text-cyan-500", bg: "bg-cyan-500/10" }
+        ];
+
+        // =================== КОМПОНЕНТЫ ===================
         function DynamicTicker() {
             const [currentIndex, setCurrentIndex] = useState(0);
             useEffect(() => {
                 const interval = setInterval(() => {
                     setCurrentIndex((prev) => (prev + 1) % MOTIVATIONAL_MESSAGES.length);
-                }, 7000); 
+                }, 6000);
                 return () => clearInterval(interval);
             }, []);
 
             return (
                 <div className="w-full text-center px-2">
-                    <div className="text-xs font-semibold italic py-3 px-5 rounded-2xl border text-zinc-500 bg-white/70 border-white/90 backdrop-blur-md transition-all duration-500 shadow-sm">
+                    <div className="text-xs font-semibold italic py-3 px-5 rounded-2xl border text-zinc-500 dark:text-zinc-300 bg-white/70 dark:bg-zinc-800/70 border-white/90 dark:border-zinc-700/50 backdrop-blur-md shadow-sm">
                         ✨ {MOTIVATIONAL_MESSAGES[currentIndex]}
                     </div>
                 </div>
             );
         }
 
+        // =================== НОВАЯ НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ ===================
+        function BottomNav({ currentTab, setCurrentTab }) {
+            return (
+                <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[85%] max-w-sm">
+                    <div className="liquid-glass-dark rounded-[30px] p-1 flex items-center shadow-2xl backdrop-blur-xl">
+                        <button 
+                            onClick={() => setCurrentTab('dashboard')}
+                            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-[24px] font-bold text-sm transition-all duration-300 ${
+                                currentTab === 'dashboard' 
+                                    ? 'text-cyan-400 bg-white/10 shadow-inner' 
+                                    : 'text-zinc-400 hover:text-zinc-200'
+                            }`}
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            <span className="hidden sm:inline">Главная</span>
+                        </button>
+                        <button 
+                            onClick={() => setCurrentTab('breathwork')}
+                            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-[24px] font-bold text-sm transition-all duration-300 ${
+                                currentTab === 'breathwork' 
+                                    ? 'text-cyan-400 bg-white/10 shadow-inner' 
+                                    : 'text-zinc-400 hover:text-zinc-200'
+                            }`}
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            <span className="hidden sm:inline">Дыхание</span>
+                        </button>
+                    </div>
+                </nav>
+            );
+        }
+
+        // =================== ГЛАВНОЕ ПРИЛОЖЕНИЕ ===================
         function PremiumZenApp() {
             const [currentTab, setCurrentTab] = useState('dashboard');
             const [selectedCategoryFilter, setSelectedCategoryFilter] = useState(null);
@@ -408,19 +492,22 @@
             const [userTotalMinutes, setUserTotalMinutes] = useState(75);
 
             const handleQuickStart = useCallback(() => {
-                const available = selectedCategoryFilter ? ALL_SESSIONS.filter(s => s.category === selectedCategoryFilter) : ALL_SESSIONS;
+                const available = selectedCategoryFilter 
+                    ? ALL_SESSIONS.filter(s => s.category === selectedCategoryFilter) 
+                    : ALL_SESSIONS;
                 const randomTrack = available[Math.floor(Math.random() * available.length)];
                 setActivePlayerSession(randomTrack);
             }, [selectedCategoryFilter]);
 
             return (
-                <div className="min-h-screen pb-36 pt-4 px-4 max-w-xl mx-auto relative flex flex-col justify-between">
-                    
+                <div className="min-h-screen pb-40 pt-6 px-4 max-w-xl mx-auto relative flex flex-col justify-between">
                     <div key={currentTab} className="flex-1 page-transition">
                         {currentTab === 'dashboard' && (
                             <DashboardView 
-                                streak={userStreak} totalMinutes={userTotalMinutes} 
-                                activeCategory={selectedCategoryFilter} setActiveCategory={setSelectedCategoryFilter}
+                                streak={userStreak} 
+                                totalMinutes={userTotalMinutes} 
+                                activeCategory={selectedCategoryFilter} 
+                                setActiveCategory={setSelectedCategoryFilter}
                                 onStart={(s) => setActivePlayerSession(s)}
                                 onQuickStart={handleQuickStart}
                                 setTab={setCurrentTab}
@@ -429,12 +516,10 @@
                         {currentTab === 'breathwork' && <BreathworkView />}
                     </div>
 
-                    <div className="mt-6 mb-2">
-                        <DynamicTicker />
-                    </div>
+                    <DynamicTicker />
 
-                    <footer className="w-full text-center py-6 mt-4 border-t border-zinc-200/40">
-                        <p className="text-[10px] font-black tracking-widest text-zinc-400 uppercase hover:text-zinc-600 transition-colors cursor-default">
+                    <footer className="w-full text-center py-6 mt-4 border-t border-zinc-200/40 dark:border-zinc-700/30">
+                        <p className="text-[10px] font-black tracking-widest text-zinc-400 dark:text-zinc-500 uppercase hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors cursor-default">
                             Разработано <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-indigo-500 font-black">EGORKIN DEV</span>
                         </p>
                     </footer>
@@ -450,86 +535,98 @@
                         />
                     )}
 
-                    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-[88%] max-w-xs">
-                        <div className="liquid-glass-dark rounded-[32px] p-1.5 flex items-center justify-between shadow-md">
-                            <button onClick={() => { setCurrentTab('dashboard'); setSelectedCategoryFilter(null); }} className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl font-bold text-xs transition-all ${currentTab === 'dashboard' ? 'text-cyan-400 bg-white/10 shadow-inner' : 'text-zinc-400'}`}>
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
-                                <span>Главная</span>
-                            </button>
-                            <button onClick={() => setCurrentTab('breathwork')} className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl font-bold text-xs transition-all ${currentTab === 'breathwork' ? 'text-cyan-400 bg-white/10 shadow-inner' : 'text-zinc-400'}`}>
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12.125 4.5V19.5M19.5 12.125H4.5" /></svg>
-                                <span>Дыхание</span>
-                            </button>
-                        </div>
-                    </nav>
+                    <BottomNav currentTab={currentTab} setCurrentTab={setCurrentTab} />
                 </div>
             );
         }
 
+        // =================== ПАНЕЛЬ УПРАВЛЕНИЯ (Главная) ===================
         function DashboardView({ streak, totalMinutes, activeCategory, setActiveCategory, onStart, onQuickStart, setTab }) {
-            const displayedSessions = activeCategory ? ALL_SESSIONS.filter(s => s.category === activeCategory) : ALL_SESSIONS;
+            const displayedSessions = activeCategory 
+                ? ALL_SESSIONS.filter(s => s.category === activeCategory) 
+                : ALL_SESSIONS;
             const trackSectionRef = useRef(null);
 
             const handleDirectionClick = useCallback((dir) => {
                 if (dir.isSpecial) {
-                    setActiveCategory(null); // сброс фильтра при переходе к дыханию
+                    setActiveCategory(null);
                     setTab('breathwork');
                 } else {
                     const nextCategory = activeCategory === dir.title ? null : dir.title;
                     setActiveCategory(nextCategory);
                     if (nextCategory) {
-                        setTimeout(() => { trackSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 120);
+                        setTimeout(() => { 
+                            trackSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); 
+                        }, 100);
                     }
                 }
             }, [activeCategory, setActiveCategory, setTab]);
 
             return (
                 <div className="space-y-8 text-center">
-                    
-                    <div className="liquid-glass rounded-[32px] p-6 flex flex-col items-center border border-white shadow-md">
-                        <span className="text-[11px] font-extrabold tracking-widest text-cyan-600 bg-cyan-50 px-4 py-1.5 rounded-full mb-3">БОЛЬШАЯ СЕМЬЯ QSTORE</span>
-                        <h1 className="text-3xl font-black tracking-tight mb-2"><span className="text-black">QSTORE</span> <span className="text-cyan-500">ZEN</span></h1>
-                        <p className="text-zinc-500 max-w-md text-xs font-medium mb-5">Раслабляющий антистресс-баланс под задачи твоей команды.</p>
+                    <div className="liquid-glass rounded-[32px] p-6 flex flex-col items-center border border-white/50 dark:border-zinc-700/30 shadow-md">
+                        <span className="text-[11px] font-extrabold tracking-widest text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-900/30 px-4 py-1.5 rounded-full mb-3">
+                            БОЛЬШАЯ СЕМЬЯ QSTORE
+                        </span>
+                        <h1 className="text-3xl font-black tracking-tight mb-2">
+                            <span className="text-black dark:text-white">QSTORE</span>{" "}
+                            <span className="text-cyan-500">ZEN</span>
+                        </h1>
+                        <p className="text-zinc-500 dark:text-zinc-400 max-w-md text-xs font-medium mb-5">
+                            Расслабляющий антистресс-баланс под задачи твоей команды
+                        </p>
 
-                        <div className="flex items-center justify-center gap-6 bg-white/90 border border-zinc-100 p-3 rounded-2xl shadow-sm w-full max-w-xs mb-5">
-                            <div className="flex-1"><span className="block text-xl font-black text-zinc-900">{streak}</span><span className="text-[9px] font-bold text-zinc-400 uppercase">Дней серии</span></div>
-                            <div className="w-[1px] h-6 bg-zinc-200" />
-                            <div className="flex-1"><span className="block text-xl font-black text-zinc-900">{totalMinutes}</span><span className="text-[9px] font-bold text-zinc-400 uppercase">Всего минут</span></div>
+                        <div className="flex items-center justify-center gap-6 bg-white/90 dark:bg-zinc-800/90 border border-zinc-100 dark:border-zinc-700/50 p-3 rounded-2xl shadow-sm w-full max-w-xs mb-5">
+                            <div className="flex-1">
+                                <span className="block text-xl font-black text-zinc-900 dark:text-zinc-100">{streak}</span>
+                                <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase">Дней серии</span>
+                            </div>
+                            <div className="w-[1px] h-6 bg-zinc-200 dark:bg-zinc-700" />
+                            <div className="flex-1">
+                                <span className="block text-xl font-black text-zinc-900 dark:text-zinc-100">{totalMinutes}</span>
+                                <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase">Всего минут</span>
+                            </div>
                         </div>
 
-                        <button onClick={onQuickStart} className="flex items-center justify-center w-full max-w-xs py-3.5 bg-gradient-to-r from-zinc-900 to-zinc-800 text-white font-bold text-xs rounded-2xl shadow-md apple-spring uppercase tracking-wider">
-                             Быстрый старт релаксации
+                        <button 
+                            onClick={onQuickStart} 
+                            className="flex items-center justify-center w-full max-w-xs py-3.5 bg-gradient-to-r from-zinc-900 to-zinc-800 dark:from-zinc-200 dark:to-zinc-300 text-white dark:text-zinc-900 font-bold text-xs rounded-2xl shadow-md apple-spring uppercase tracking-wider"
+                        >
+                            Быстрый старт релаксации
                         </button>
                     </div>
 
+                    {/* Сетка направлений */}
                     <div className="space-y-4">
                         <div className="flex items-center justify-between px-1 h-9">
-                            <h2 className="text-lg font-extrabold text-zinc-900 tracking-tight whitespace-nowrap">ВЫБЕРИ НАПРАВЛЕНИЕ</h2>
+                            <h2 className="text-lg font-extrabold text-zinc-900 dark:text-zinc-100 tracking-tight">ВЫБЕРИ НАПРАВЛЕНИЕ</h2>
                             {activeCategory && (
-                                <button onClick={() => setActiveCategory(null)} className="text-[11px] font-bold text-cyan-600 bg-white px-3 py-1.5 rounded-full shadow-sm border border-zinc-200/60 active:scale-95 transition-all whitespace-nowrap ml-2 page-transition">
+                                <button 
+                                    onClick={() => setActiveCategory(null)} 
+                                    className="text-[11px] font-bold text-cyan-600 dark:text-cyan-400 bg-white dark:bg-zinc-800 px-3 py-1.5 rounded-full shadow-sm border border-zinc-200/60 dark:border-zinc-700/40 active:scale-95 transition-all page-transition"
+                                >
                                     Сбросить ×
                                 </button>
                             )}
                         </div>
                         
-                        <div className="grid grid-cols-2 gap-3.5">
+                        <div className="grid grid-cols-2 gap-3">
                             {DIRECTIONS.map((dir, index) => {
                                 const isSelected = activeCategory === dir.title;
                                 return (
                                     <div 
                                         key={dir.id}
                                         onClick={() => handleDirectionClick(dir)}
-                                        style={{ animationDelay: `${index * 40}ms` }}
-                                        className={`bg-white/95 rounded-[28px] p-5 flex flex-col items-center justify-center text-center aspect-square border apple-spring cursor-pointer select-none transition-all duration-300 ${
+                                        className={`relative overflow-hidden rounded-[28px] p-5 flex flex-col items-center justify-center text-center aspect-square border apple-spring cursor-pointer select-none transition-all duration-300 ${
                                             isSelected 
-                                                ? 'border-zinc-900 bg-zinc-50/80 shadow-inner scale-[0.96] ring-4 ring-zinc-900/5' 
-                                                : 'border-zinc-100 shadow-sm'
+                                                ? 'border-zinc-900 dark:border-zinc-400 bg-zinc-50/90 dark:bg-zinc-800/90 shadow-inner scale-[0.96] ring-4 ring-zinc-900/5 dark:ring-zinc-400/10' 
+                                                : 'border-zinc-100 dark:border-zinc-700/50 bg-white/80 dark:bg-zinc-800/80 shadow-sm'
                                         }`}
                                     >
-                                        <div className={`w-12 h-12 ${dir.bg} ${dir.iconColor} rounded-2xl flex items-center justify-center text-xl font-bold mb-4 shadow-sm transition-transform ${isSelected ? 'scale-110 rotate-3' : ''}`}>
-                                            {dir.symbol}
+                                        <div className={`w-12 h-12 ${dir.bg} ${dir.color} rounded-2xl flex items-center justify-center text-xl font-bold mb-4 shadow-sm transition-transform ${isSelected ? 'scale-110 rotate-3' : ''}`}>
+                                            {dir.icon}
                                         </div>
-                                        <span className={`text-[13px] font-bold leading-snug px-1 transition-colors ${isSelected ? 'text-zinc-950 font-black' : 'text-zinc-800'}`}>
+                                        <span className={`text-[13px] font-bold leading-snug px-1 transition-colors ${isSelected ? 'text-zinc-950 dark:text-zinc-100 font-black' : 'text-zinc-800 dark:text-zinc-200'}`}>
                                             {dir.title}
                                         </span>
                                     </div>
@@ -538,50 +635,53 @@
                         </div>
                     </div>
 
-                    <div ref={trackSectionRef} key={activeCategory || 'all'} className="space-y-3 text-left pt-6 scroll-mt-6 page-transition">
-                        <h3 className="text-xs font-extrabold text-zinc-400 uppercase tracking-wider px-1">
+                    {/* Список сессий */}
+                    <div ref={trackSectionRef} key={activeCategory || 'all'} className="space-y-3 text-left pt-4 scroll-mt-6 page-transition">
+                        <h3 className="text-xs font-extrabold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider px-1">
                             {activeCategory ? `Программы: ${activeCategory}` : 'Все доступные сессии'} ({displayedSessions.length})
                         </h3>
                         
-                        <div className="space-y-2.5 max-h-[420px] overflow-y-auto pr-1 scrollbar-none pb-4">
+                        <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1 scrollbar-none pb-4">
                             {displayedSessions.map((session, sIdx) => (
                                 <div 
                                     key={session.id} 
                                     onClick={() => onStart(session)} 
-                                    style={{ animationDelay: `${sIdx * 30}ms` }}
-                                    className="liquid-glass bg-white/80 hover:bg-white rounded-2xl p-4 flex items-center justify-between cursor-pointer apple-spring shadow-sm border border-white group"
+                                    className="liquid-glass bg-white/80 dark:bg-zinc-800/80 hover:bg-white dark:hover:bg-zinc-700/80 rounded-2xl p-4 flex items-center justify-between cursor-pointer apple-spring shadow-sm border border-white/50 dark:border-zinc-700/30 group"
                                 >
                                     <div className="space-y-1 pr-4 truncate">
-                                        <span className="text-[9px] font-extrabold text-cyan-600 bg-cyan-50 px-2 py-0.5 rounded uppercase">{session.category}</span>
-                                        <h4 className="font-bold text-zinc-900 text-xs sm:text-sm truncate group-hover:text-cyan-600 transition-colors">{session.title}</h4>
-                                        <div className="flex items-center gap-2 text-[10px] text-zinc-400 font-medium">
+                                        <span className="text-[9px] font-extrabold text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-900/30 px-2 py-0.5 rounded uppercase">
+                                            {session.category}
+                                        </span>
+                                        <h4 className="font-bold text-zinc-900 dark:text-zinc-100 text-xs sm:text-sm truncate group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+                                            {session.title}
+                                        </h4>
+                                        <div className="flex items-center gap-2 text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">
                                             <span>⏱ {session.duration} мин</span>
                                             <span>•</span>
                                             <span>{SOUND_NAMES[session.sound]}</span>
                                         </div>
                                     </div>
-                                    <div className="w-8 h-8 rounded-full bg-zinc-50 group-hover:bg-cyan-50 flex items-center justify-center text-zinc-400 group-hover:text-cyan-600 transition-all shrink-0">
-                                        <svg className="w-4 h-4 fill-current text-cyan-600" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                                    <div className="w-8 h-8 rounded-full bg-zinc-50 dark:bg-zinc-700 group-hover:bg-cyan-50 dark:group-hover:bg-cyan-900/40 flex items-center justify-center text-zinc-400 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-all shrink-0">
+                                        <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     </div>
-
                 </div>
             );
         }
 
+        // =================== ДЫХАТЕЛЬНАЯ ПРАКТИКА (С МУЗЫКОЙ) ===================
         function BreathworkView() {
             const [phase, setPhase] = useState('Вдох');
             const [timer, setTimer] = useState(4);
             const [active, setActive] = useState(false);
+            const [cycles, setCycles] = useState(0);
+            const [musicType, setMusicType] = useState('oriental'); // фоновая музыка для дыхания
 
-            // Очистка звука при уходе с вкладки
             useEffect(() => {
-                return () => {
-                    AudioEngine.stop();
-                };
+                return () => { AudioEngine.stop(); };
             }, []);
 
             useEffect(() => {
@@ -591,111 +691,131 @@
                         setTimer(t => {
                             if (t <= 1) {
                                 setPhase(p => p === 'Вдох' ? 'Задержка' : p === 'Задержка' ? 'Выдох' : 'Вдох');
+                                if (phase === 'Выдох') setCycles(c => c + 1);
                                 return 4;
                             }
                             return t - 1;
                         });
                     }, 1000);
-                } else { 
-                    clearInterval(interval); 
+                } else {
+                    setPhase('Вдох');
+                    setTimer(4);
+                    setCycles(0);
                 }
                 return () => clearInterval(interval);
-            }, [active]);
+            }, [active, phase]);
 
             const togglePractice = useCallback(() => {
                 setActive(prev => {
                     const next = !prev;
                     if (next) {
-                        AudioEngine.playAmbient('oriental', 'Дыхательные практики');
+                        AudioEngine.playAmbient(musicType, 'Дыхательные практики');
+                        AudioEngine.setVolume(0.03);
                     } else {
                         AudioEngine.stop();
                     }
                     return next;
                 });
-            }, []);
+            }, [musicType]);
 
             return (
-                <div className="max-w-md mx-auto text-center space-y-6 pt-4 page-transition">
-                    <h2 className="text-xl font-black text-zinc-900">Антистресс-дыхание</h2>
-                    <div className="liquid-glass bg-white rounded-[40px] aspect-square max-w-[240px] mx-auto flex flex-col justify-center items-center relative shadow-sm">
+                <div className="max-w-md mx-auto text-center space-y-8 pt-6 page-transition">
+                    <div className="space-y-2">
+                        <h2 className="text-2xl font-black text-zinc-900 dark:text-white">Антистресс-дыхание</h2>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">Квадратное дыхание 4×4</p>
+                    </div>
+
+                    <div className="liquid-glass bg-white/70 dark:bg-zinc-800/70 rounded-[40px] aspect-square max-w-[280px] mx-auto flex flex-col justify-center items-center relative shadow-md">
                         {active && (
                             <>
-                                <div className="absolute inset-4 rounded-[32px] bg-cyan-400/10 blur-xl visual-wave-1 pointer-events-none" />
-                                <div className="absolute inset-4 rounded-[32px] bg-indigo-400/10 blur-xl visual-wave-2 pointer-events-none" />
+                                <div className="absolute inset-4 rounded-[32px] bg-cyan-400/10 dark:bg-cyan-400/5 blur-xl visual-wave-1 pointer-events-none" />
+                                <div className="absolute inset-4 rounded-[32px] bg-indigo-400/10 dark:bg-indigo-400/5 blur-xl visual-wave-2 pointer-events-none" />
                             </>
                         )}
-                        <h3 className="text-base font-bold z-10 text-zinc-800">{active ? phase : 'Квадрат баланса'}</h3>
-                        <div className="text-4xl font-light mt-2 z-10 tabular-nums">{timer}с</div>
+                        <h3 className="text-lg font-bold z-10 text-zinc-800 dark:text-zinc-200">
+                            {active ? phase : 'Нажми старт'}
+                        </h3>
+                        <div className="text-5xl font-light mt-4 z-10 tabular-nums text-zinc-900 dark:text-white">
+                            {timer}с
+                        </div>
+                        {active && (
+                            <div className="mt-4 z-10">
+                                <span className="text-xs font-medium text-zinc-400 dark:text-zinc-500">
+                                    Циклов: {cycles}
+                                </span>
+                            </div>
+                        )}
                     </div>
-                    <button onClick={togglePractice} className="w-full max-w-[180px] py-3.5 bg-zinc-950 text-white rounded-full font-bold shadow-md apple-spring text-xs uppercase tracking-wider">
-                        {active ? 'Остановить' : 'Начать практику'}
+
+                    {/* Выбор фоновой музыки для дыхания */}
+                    <div className="bg-white/80 dark:bg-zinc-800/80 rounded-2xl p-4 border border-white/50 dark:border-zinc-700/30 max-w-[280px] mx-auto">
+                        <span className="text-[10px] font-extrabold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2 block">Фоновая музыка</span>
+                        <div className="grid grid-cols-3 gap-2">
+                            {['oriental', 'bell', 'rain', 'forest', 'fire', 'drone'].map(type => (
+                                <button
+                                    key={type}
+                                    onClick={() => { setMusicType(type); if(active) { AudioEngine.stop(); AudioEngine.playAmbient(type, 'Дыхательные практики'); } }}
+                                    className={`text-[11px] font-bold py-2 px-1 rounded-xl border transition-all ${
+                                        musicType === type 
+                                            ? 'bg-zinc-900 dark:bg-zinc-200 text-white dark:text-zinc-900 border-zinc-900 dark:border-zinc-200'
+                                            : 'bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 border-transparent'
+                                    }`}
+                                >
+                                    {SOUND_NAMES[type]}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <button 
+                        onClick={togglePractice} 
+                        className="w-full max-w-[240px] py-4 bg-gradient-to-r from-zinc-950 to-zinc-900 dark:from-zinc-200 dark:to-zinc-300 text-white dark:text-zinc-900 rounded-full font-bold shadow-lg apple-spring text-sm uppercase tracking-wider mx-auto block"
+                    >
+                        {active ? 'Остановить практику' : 'Начать практику'}
                     </button>
                 </div>
             );
         }
 
+        // =================== ПЛЕЕР МЕДИТАЦИИ ===================
         function MeditationPlayerScreen({ session, onClose, onComplete }) {
             const [isPlaying, setIsPlaying] = useState(true);
             const [secondsRemaining, setSecondsRemaining] = useState(session.duration * 60);
             const [isVoiceEnabled, setIsVoiceEnabled] = useState(true);
             const [soundType, setSoundType] = useState(session.sound || 'oriental');
+            const [volume, setVolume] = useState(0.04);
 
             const voiceAudioRef = useRef(null);
             const streamMusicRef = useRef(null);
-            
             const currentVoiceIdxRef = useRef(0);
-            const voiceCooldownRef = useRef(5); 
+            const voiceCooldownRef = useRef(5);
             const isVoicePlayingRef = useRef(false);
             const speechDurationCounterRef = useRef(0);
-            const completedRef = useRef(false); // флаг предотвращения двойного завершения
+            const completedRef = useRef(false);
 
             const totalSeconds = session.duration * 60;
             const elapsedSeconds = totalSeconds - secondsRemaining;
 
-            // Инициализация аудио-элементов
             useEffect(() => {
                 AudioEngine.init();
-
-                // Голосовой гид
                 voiceAudioRef.current = new Audio();
-                voiceAudioRef.current.crossOrigin = "anonymous";
-                voiceAudioRef.current.volume = 0.50; 
-
+                voiceAudioRef.current.volume = 0.45;
                 const handleVoiceEnded = () => {
                     isVoicePlayingRef.current = false;
                     speechDurationCounterRef.current = 0;
-                    voiceCooldownRef.current = 60;
+                    voiceCooldownRef.current = 45;
                 };
                 voiceAudioRef.current.addEventListener('ended', handleVoiceEnded);
 
-                // Потоковое радио
-                streamMusicRef.current = new Audio(session.url);
-                streamMusicRef.current.loop = true;
-                streamMusicRef.current.crossOrigin = "anonymous";
-                streamMusicRef.current.volume = 0.04;
-                streamMusicRef.current.onerror = (e) => {
-                    console.warn("Радио-поток недоступен, используем только синтезированный звук.");
-                    // Не прерываем работу, синтез продолжается
-                };
-
-                // Подключение к AudioContext для возможности маршрутизации (опционально)
-                if (AudioEngine.ctx) {
-                    try {
-                        const voiceSource = AudioEngine.ctx.createMediaElementSource(voiceAudioRef.current);
-                        voiceSource.connect(AudioEngine.ctx.destination);
-                        
-                        const musicSource = AudioEngine.ctx.createMediaElementSource(streamMusicRef.current);
-                        musicSource.connect(AudioEngine.ctx.destination);
-                    } catch (e) {
-                        // Уже подключено или не поддерживается – игнорируем
-                    }
-                }
-
-                // Старт воспроизведения
-                if (isPlaying) {
+                if (session.url) {
+                    streamMusicRef.current = new Audio(session.url);
+                    streamMusicRef.current.loop = true;
+                    streamMusicRef.current.volume = 0.03;
                     streamMusicRef.current.play().catch(() => {});
-                    AudioEngine.playAmbient(soundType, session.category);
                 }
+
+                AudioEngine.playAmbient(soundType, session.category);
+                AudioEngine.setVolume(volume);
 
                 return () => {
                     if (voiceAudioRef.current) {
@@ -704,30 +824,24 @@
                     }
                     if (streamMusicRef.current) {
                         streamMusicRef.current.pause();
-                        streamMusicRef.current.src = ''; // предотвращаем утечку
+                        streamMusicRef.current.src = '';
                     }
                     AudioEngine.stop();
                 };
-            }, []); // eslint-disable-line react-hooks/exhaustive-deps
+            }, []);
 
-            // Управление play/pause и типом звука
             useEffect(() => {
                 if (isPlaying) {
                     AudioEngine.playAmbient(soundType, session.category);
-                    if (streamMusicRef.current) {
-                        streamMusicRef.current.play().catch(() => {});
-                    }
-                    if (isVoiceEnabled && isVoicePlayingRef.current && voiceAudioRef.current) {
-                        voiceAudioRef.current.play().catch(() => {});
-                    }
+                    AudioEngine.setVolume(volume);
+                    if (streamMusicRef.current) streamMusicRef.current.play().catch(() => {});
                 } else {
                     AudioEngine.stop();
                     if (voiceAudioRef.current) voiceAudioRef.current.pause();
                     if (streamMusicRef.current) streamMusicRef.current.pause();
                 }
-            }, [isPlaying, soundType, session.category, isVoiceEnabled]);
+            }, [isPlaying, soundType, volume]);
 
-            // Мгновенная реакция на отключение голоса
             useEffect(() => {
                 if (!isVoiceEnabled && voiceAudioRef.current) {
                     voiceAudioRef.current.pause();
@@ -737,34 +851,23 @@
                 }
             }, [isVoiceEnabled]);
 
-            // Основной таймер сессии + логика голосового сопровождения
             useEffect(() => {
                 let sessionTimer = null;
-                
                 if (isPlaying && secondsRemaining > 0) {
                     sessionTimer = setInterval(() => {
-                        // Логика голосового гида (только если включен и не на паузе голос)
                         if (isVoiceEnabled) {
                             if (isVoicePlayingRef.current) {
                                 speechDurationCounterRef.current += 1;
-                                // Если гид говорит слишком долго (>25 сек), принудительно останавливаем
-                                if (speechDurationCounterRef.current >= 25) {
+                                if (speechDurationCounterRef.current >= 20) {
                                     if (voiceAudioRef.current) voiceAudioRef.current.pause();
                                     isVoicePlayingRef.current = false;
                                     speechDurationCounterRef.current = 0;
-                                    voiceCooldownRef.current = 60;
-                                } else {
-                                    // продолжаем играть, если вдруг встал на паузу
-                                    if (voiceAudioRef.current && voiceAudioRef.current.paused) {
-                                        voiceAudioRef.current.play().catch(() => {});
-                                    }
+                                    voiceCooldownRef.current = 50;
                                 }
                             } else {
-                                // Тишина гида, ждём кулдаун
                                 if (voiceCooldownRef.current > 0) {
                                     voiceCooldownRef.current -= 1;
                                 } else {
-                                    // Запускаем следующую случайную запись
                                     if (voiceAudioRef.current) {
                                         voiceAudioRef.current.src = VOICE_FILES[currentVoiceIdxRef.current];
                                         voiceAudioRef.current.load();
@@ -776,11 +879,8 @@
                                     }
                                 }
                             }
-                        } else {
-                            // Голос выключен, ничего не делаем
                         }
 
-                        // Обратный отсчёт
                         if (secondsRemaining <= 1) {
                             if (!completedRef.current) {
                                 completedRef.current = true;
@@ -794,15 +894,8 @@
                         }
                     }, 1000);
                 }
-                
                 return () => clearInterval(sessionTimer);
-            }, [isPlaying, isVoiceEnabled, secondsRemaining, session.duration, onComplete]);
-
-            const changeNoiseDirectly = useCallback((type) => {
-                setSoundType(type);
-            }, []);
-
-            const progressPercentage = (elapsedSeconds / totalSeconds) * 100;
+            }, [isPlaying, isVoiceEnabled, secondsRemaining]);
 
             const formatTime = (secs) => {
                 const m = Math.floor(secs / 60);
@@ -810,32 +903,50 @@
                 return `${m}:${s}`;
             };
 
+            const progressPercentage = (elapsedSeconds / totalSeconds) * 100;
+
+            const handleClose = () => {
+                AudioEngine.stop();
+                if (voiceAudioRef.current) voiceAudioRef.current.pause();
+                if (streamMusicRef.current) { streamMusicRef.current.pause(); streamMusicRef.current.src = ''; }
+                onClose();
+            };
+
+            const handleComplete = () => {
+                if (!completedRef.current) {
+                    completedRef.current = true;
+                    AudioEngine.stop();
+                    if (voiceAudioRef.current) voiceAudioRef.current.pause();
+                    if (streamMusicRef.current) { streamMusicRef.current.pause(); streamMusicRef.current.src = ''; }
+                    onComplete(session.duration);
+                }
+            };
+
             return (
-                <div className="fixed inset-0 z-50 bg-[#F4F5F9]/80 backdrop-blur-2xl flex flex-col justify-between p-6 text-center page-transition overflow-y-auto scrollbar-none text-zinc-900">
-                    
+                <div className="fixed inset-0 z-50 bg-[var(--bg-main)]/95 backdrop-blur-2xl flex flex-col justify-between p-6 text-center page-transition overflow-y-auto scrollbar-none">
                     <div className="player-neon-container">
-                        <div className="player-neon-orb-1"></div>
-                        <div className="player-neon-orb-2"></div>
-                        <div className="player-neon-orb-3"></div>
+                        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                            <div className="absolute w-[400px] h-[400px] top-[-60px] left-[-80px] bg-radial-gradient(circle, rgba(6,182,212,0.25), transparent 70%) blur-[80px] animate-neon1"></div>
+                            <div className="absolute w-[450px] h-[450px] bottom-[-80px] right-[-80px] bg-radial-gradient(circle, rgba(147,51,234,0.2), transparent 70%) blur-[90px] animate-neon2"></div>
+                            <div className="absolute w-[350px] h-[350px] top-[30%] left-[15%] bg-radial-gradient(circle, rgba(16,185,129,0.15), transparent 70%) blur-[80px] animate-neon3"></div>
+                        </div>
                     </div>
 
                     <div className="flex items-center justify-between w-full max-w-md mx-auto shrink-0 px-2 relative z-10">
-                        <button onClick={() => { AudioEngine.stop(); if (voiceAudioRef.current) voiceAudioRef.current.pause(); if(streamMusicRef.current) streamMusicRef.current.pause(); onClose(); }} className="bg-zinc-200/80 text-zinc-900 px-5 py-2.5 rounded-full text-xs font-bold apple-spring">Назад</button>
+                        <button onClick={handleClose} className="bg-zinc-200/80 dark:bg-zinc-700/80 text-zinc-900 dark:text-zinc-100 px-5 py-2.5 rounded-full text-xs font-bold apple-spring hover:bg-zinc-300/80 dark:hover:bg-zinc-600/80">Назад</button>
                         <div className="text-center truncate max-w-[180px]">
-                            <h2 className="font-extrabold text-zinc-900 text-xs truncate">{session.title}</h2>
-                            <span className="text-[9px] font-bold text-cyan-600 block mt-0.5">Режим: {session.category}</span>
+                            <h2 className="font-extrabold text-zinc-900 dark:text-white text-sm truncate">{session.title}</h2>
+                            <span className="text-[9px] font-bold text-cyan-600 dark:text-cyan-400 block mt-0.5">{session.category}</span>
                         </div>
-                        <button onClick={() => { if (!completedRef.current) { completedRef.current = true; AudioEngine.stop(); if (voiceAudioRef.current) voiceAudioRef.current.pause(); if(streamMusicRef.current) streamMusicRef.current.pause(); onComplete(session.duration); } }} className="bg-zinc-900 text-white px-5 py-2.5 rounded-full text-xs font-bold apple-spring">Готово</button>
+                        <button onClick={handleComplete} className="bg-zinc-900 dark:bg-zinc-200 text-white dark:text-zinc-900 px-5 py-2.5 rounded-full text-xs font-bold apple-spring hover:bg-zinc-800 dark:hover:bg-zinc-300">Готово</button>
                     </div>
 
-                    <div className="flex-1 flex flex-col items-center justify-center relative my-4 min-h-[180px] z-10">
-                        {isPlaying && <div className="absolute w-64 h-64 rounded-full bg-gradient-to-tr from-cyan-400/10 to-emerald-500/10 blur-xl visual-wave-1 pointer-events-none" />}
-                        
-                        <div className="w-40 h-40 rounded-full liquid-glass flex flex-col items-center justify-center shadow-md border border-white z-10 relative">
-                            <span className="text-4xl font-light tabular-nums text-zinc-900">{Math.floor(secondsRemaining / 60)}:{String(secondsRemaining % 60).padStart(2, '0')}</span>
-                            
+                    <div className="flex-1 flex flex-col items-center justify-center relative my-6 min-h-[200px] z-10">
+                        {isPlaying && <div className="absolute w-64 h-64 rounded-full bg-gradient-to-tr from-cyan-400/10 to-emerald-500/10 dark:from-cyan-400/5 dark:to-emerald-500/5 blur-xl visual-wave-1 pointer-events-none" />}
+                        <div className="w-44 h-44 rounded-full liquid-glass bg-white/80 dark:bg-zinc-800/80 flex flex-col items-center justify-center shadow-md border border-white/50 dark:border-zinc-700/30 z-10 relative">
+                            <span className="text-4xl font-light tabular-nums text-zinc-900 dark:text-white">{formatTime(secondsRemaining)}</span>
                             {isPlaying && (
-                                <div className="flex items-end gap-1.5 h-5 mt-3">
+                                <div className="flex items-end gap-1.5 h-6 mt-3">
                                     <div className="w-1 bg-emerald-400 rounded-full eq-bar eq-slow" style={{height: '100%'}}></div>
                                     <div className="w-1 bg-cyan-400 rounded-full eq-bar" style={{height: '60%', animationDelay: '0.2s'}}></div>
                                     <div className="w-1 bg-teal-500 rounded-full eq-bar eq-slow" style={{height: '40%', animationDelay: '0.4s'}}></div>
@@ -844,40 +955,41 @@
                         </div>
                     </div>
 
-                    <div className="w-full max-w-sm mx-auto space-y-2 shrink-0 relative z-10">
-                        <div className="w-full bg-black/[0.07] rounded-full h-1 overflow-hidden relative">
-                            <div style={{ width: `${progressPercentage}%` }} className="bg-zinc-800 h-full rounded-full transition-all duration-300 ease-out" />
-                        </div>
-                        
-                        <div className="flex justify-between text-[11px] font-medium text-zinc-400/90 tracking-tight px-0.5 select-none">
-                            <span>{formatTime(elapsedSeconds)}</span>
-                            <span>{formatTime(totalSeconds)}</span>
+                    <div className="w-full max-w-sm mx-auto space-y-4 shrink-0 relative z-10">
+                        <div className="space-y-1">
+                            <div className="w-full bg-black/[0.06] dark:bg-white/[0.1] rounded-full h-1.5 overflow-hidden">
+                                <div style={{ width: `${progressPercentage}%` }} className="bg-gradient-to-r from-cyan-500 to-emerald-500 h-full rounded-full transition-all duration-300 ease-out" />
+                            </div>
+                            <div className="flex justify-between text-[11px] font-medium text-zinc-400 dark:text-zinc-500 tracking-tight px-0.5 select-none">
+                                <span>{formatTime(elapsedSeconds)}</span>
+                                <span>{formatTime(totalSeconds)}</span>
+                            </div>
                         </div>
 
-                        <div className="flex items-center justify-center pt-3">
-                            <button onClick={() => setIsPlaying(!isPlaying)} className="w-14 h-14 rounded-full bg-zinc-950 text-white flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-transform">
+                        <div className="flex items-center justify-center">
+                            <button onClick={() => setIsPlaying(!isPlaying)} className="w-16 h-16 rounded-full bg-gradient-to-r from-zinc-950 to-zinc-900 dark:from-zinc-200 dark:to-zinc-300 text-white dark:text-zinc-900 flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-transform">
                                 {isPlaying ? (
-                                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                                    <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                                 ) : (
-                                    <svg className="w-5 h-5 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                    <svg className="w-6 h-6 fill-current ml-0.5" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                                 )}
                             </button>
                         </div>
 
-                        <div className="bg-white/90 border border-zinc-200/60 rounded-3xl p-5 space-y-4 shadow-sm text-left backdrop-blur-md">
+                        <div className="bg-white/90 dark:bg-zinc-800/90 border border-zinc-200/60 dark:border-zinc-700/40 rounded-3xl p-5 space-y-4 shadow-sm text-left backdrop-blur-md">
                             <div>
-                                <span className="block text-[9px] font-black text-zinc-400 uppercase tracking-wider mb-2.5">Генерируемый звук (Мягкий фон)</span>
+                                <span className="block text-[9px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2.5">Фоновый звук</span>
                                 <div className="grid grid-cols-2 gap-1.5 text-[11px] font-bold">
-                                    {['oriental', 'bell', 'drone', 'waves'].map((snd) => {
+                                    {['oriental', 'bell', 'drone', 'waves', 'rain', 'forest', 'fire'].map((snd) => {
                                         const isSelected = soundType === snd;
                                         return (
                                             <button 
                                                 key={snd} 
-                                                onClick={() => changeNoiseDirectly(snd)} 
+                                                onClick={() => setSoundType(snd)} 
                                                 className={`py-2.5 px-2 rounded-xl transition-all flex items-center justify-center gap-1 border active:scale-95 ${
                                                     isSelected 
-                                                        ? 'bg-zinc-900 text-white border-zinc-900 shadow-sm font-black' 
-                                                        : 'bg-zinc-100 text-zinc-600 border-transparent hover:bg-zinc-200'
+                                                        ? 'bg-zinc-900 dark:bg-zinc-200 text-white dark:text-zinc-900 border-zinc-900 dark:border-zinc-200 shadow-sm font-black' 
+                                                        : 'bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 border-transparent hover:bg-zinc-200 dark:hover:bg-zinc-600'
                                                 }`}
                                             >
                                                 {SOUND_NAMES[snd]}
@@ -887,9 +999,22 @@
                                 </div>
                             </div>
 
-                            <div className="pt-3.5 border-t border-zinc-100 flex items-center justify-between">
-                                <span className="text-xs font-bold text-zinc-800">Озвучка гида (Сопровождение)</span>
-                                <button onClick={() => setIsVoiceEnabled(!isVoiceEnabled)} className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors duration-300 ${isVoiceEnabled ? 'bg-emerald-500' : 'bg-zinc-200'}`}>
+                            <div>
+                                <span className="block text-[9px] font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2">Громкость фона</span>
+                                <input 
+                                    type="range" 
+                                    min="0" max="0.1" step="0.01" value={volume} 
+                                    onChange={(e) => { setVolume(parseFloat(e.target.value)); AudioEngine.setVolume(parseFloat(e.target.value)); }} 
+                                    className="w-full h-1 bg-zinc-200 dark:bg-zinc-600 rounded-full appearance-none cursor-pointer accent-cyan-500"
+                                />
+                            </div>
+
+                            <div className="pt-3 border-t border-zinc-100 dark:border-zinc-700 flex items-center justify-between">
+                                <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200">Голосовой гид</span>
+                                <button 
+                                    onClick={() => setIsVoiceEnabled(!isVoiceEnabled)} 
+                                    className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors duration-300 ${isVoiceEnabled ? 'bg-emerald-500' : 'bg-zinc-200 dark:bg-zinc-600'}`}
+                                >
                                     <span className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform duration-300 ${isVoiceEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
                                 </button>
                             </div>
@@ -899,7 +1024,6 @@
                     <div className="mt-4 shrink-0 max-w-sm mx-auto w-full relative z-10">
                         <DynamicTicker />
                     </div>
-
                 </div>
             );
         }
